@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:weightSum="3"
+    android:baselineAligned="false">
+
+    <fragment
+        android:id="@+id/f_recipes_list"
+        android:name="com.example.bakingapp.views.fragments.RecipesListFragment"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+    </fragment>
+
+    <LinearLayout
+        android:id="@+id/f_recipe_details"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="2"
+        android:orientation="horizontal">
+    </LinearLayout>
+
+</LinearLayout>
