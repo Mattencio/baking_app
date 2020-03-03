@@ -65,8 +65,8 @@ public class RecipesListFragment extends Fragment {
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
+    public void onStop() {
+        super.onStop();
         mUnbinder.unbind();
     }
 }
