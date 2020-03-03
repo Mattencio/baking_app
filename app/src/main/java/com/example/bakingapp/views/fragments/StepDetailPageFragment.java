@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -35,6 +36,8 @@ public class StepDetailPageFragment extends Fragment {
     private static final String STEP_DESCRIPTION = "step_text";
     private static final String STEP_VIDEO_URL = "step_video_url";
     private static final String STEP_THUMBNAIL_URL = "step_thumbnail_url";
+    private static final String EXO_CURRENT_POSITION = "exo_current_position";
+    private static final String EXO_PLAY_WHEN_READY = "exo_play_when_ready";
 
     @BindView(R.id.tv_step_details_description) TextView mTvStepDescription;
     @BindView(R.id.exo_player_step_video) PlayerView mExoPlayerView;
@@ -46,6 +49,8 @@ public class StepDetailPageFragment extends Fragment {
     private String mVideoUrl;
     private String mThumbnailUrl;
     private SimpleExoPlayer mExoPlayer;
+    private Long mExoCurrentPosition;
+    private Boolean mExoPlayWhenReady;
 
     public StepDetailPageFragment() {
         // Required empty public constructor
@@ -88,6 +93,10 @@ public class StepDetailPageFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        if (savedInstanceState != null) {
+            mExoCurrentPosition = savedInstanceState.getLong(EXO_CURRENT_POSITION);
+            mExoPlayWhenReady = savedInstanceState.getBoolean(EXO_PLAY_WHEN_READY);
+        }
         View view = inflater.inflate(R.layout.fragment_step_detail_page, container, false);
         mUnbinder = ButterKnife.bind(this, view);
         getArgumentsValues();
@@ -105,7 +114,17 @@ public class StepDetailPageFragment extends Fragment {
     public void onPause() {
         super.onPause();
         if (mExoPlayer != null) {
-            mExoPlayer.setPlayWhenReady(false);
+            mExoCurrentPosition = mExoPlayer.getCurrentPosition();
+            mExoPlayWhenReady = mExoPlayer.getPlayWhenReady();
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (mExoCurrentPosition != null && mExoPlayWhenReady != null) {
+            outState.putLong(EXO_CURRENT_POSITION, mExoCurrentPosition);
+            outState.putBoolean(EXO_PLAY_WHEN_READY, mExoPlayWhenReady);
         }
     }
 
@@ -126,7 +145,7 @@ public class StepDetailPageFragment extends Fragment {
         Context context = getContext();
         mExoPlayer = ExoPlayerFactory.newSimpleInstance(context, trackSelector);
         mExoPlayer.addListener(new ExoPlayerListener());
-        mExoPlayer.setPlayWhenReady(true);
+        mExoPlayer.setPlayWhenReady(mExoPlayWhenReady != null ? mExoPlayWhenReady : true);
         mExoPlayer.prepare(buildMediaSource(url, context));
 
         mExoPlayerView.setPlayer(mExoPlayer);
@@ -201,6 +220,9 @@ public class StepDetailPageFragment extends Fragment {
             if (playbackState == Player.STATE_READY) {
                 setProgressBarVisibility(false);
                 setPlayerVisibility(true);
+                if (mExoCurrentPosition != null) {
+                    mExoPlayer.seekTo(mExoCurrentPosition);
+                }
             }
         }
     }

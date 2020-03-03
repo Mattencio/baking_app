@@ -7,13 +7,12 @@
     android:weightSum="3"
     android:baselineAligned="false">
 
-    <fragment
+    <FrameLayout
         android:id="@+id/f_recipes_list"
-        android:name="com.example.bakingapp.views.fragments.RecipesListFragment"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1">
-    </fragment>
+    </FrameLayout>
 
     <LinearLayout
         android:id="@+id/f_recipe_details"

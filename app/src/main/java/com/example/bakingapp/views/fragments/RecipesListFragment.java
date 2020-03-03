@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.test.espresso.idling.CountingIdlingResource;
 import butterknife.BindString;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -59,7 +60,7 @@ public class RecipesListFragment extends Fragment {
             }
             mRecipesListAdapter = new RecipesListAdapter(recipesList, onRecipeClickCallback);
             mRecyclerRecipesList.setAdapter(mRecipesListAdapter);
-            mMainActivityViewModel.setIdleResource(false);
+            mMainActivityViewModel.decrementIdleResource();
         });
     }
 

@@ -23,6 +23,7 @@ import com.example.bakingapp.viewmodels.MainActivityViewModel;
 import com.example.bakingapp.views.adapters.RecipesListAdapter.OnRecipeClickListener;
 import com.example.bakingapp.views.adapters.StepsListAdapter.OnStepClickListener;
 import com.example.bakingapp.views.fragments.RecipeStepsFragment;
+import com.example.bakingapp.views.fragments.RecipesListFragment;
 import com.example.bakingapp.views.fragments.StepDetailsViewPagerFragment;
 
 public class MainActivity extends AppCompatActivity implements OnRecipeClickListener, OnStepClickListener {
@@ -31,7 +32,7 @@ public class MainActivity extends AppCompatActivity implements OnRecipeClickList
     private boolean mIsTwoPanels;
 
     @Nullable
-    private final CountingIdlingResource mDownloadingIdleResource = new CountingIdlingResource("DOWNLOADING_IDLE_RESOURCE");
+    private CountingIdlingResource mDownloadingIdleResource;
 
     @Nullable
     @BindView(R.id.f_recipe_details) View mDetailsFragment;
@@ -41,18 +42,14 @@ public class MainActivity extends AppCompatActivity implements OnRecipeClickList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mMainActivityViewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
-        isIdleResourceWaiting(mDownloadingIdleResource, true);
+        mMainActivityViewModel.incrementIdleResource();
         setContentView(R.layout.activity_main);
+        if (savedInstanceState == null) {
+            placeNewFragment(new RecipesListFragment(), false);
+        }
         listenToToolbarTitleChanges();
-        listenToIdleResource();
         ButterKnife.bind(this);
         mIsTwoPanels = mDetailsFragment != null;
-    }
-
-    private void listenToIdleResource() {
-        mMainActivityViewModel.getIdleResource().observe(this, isWaiting -> {
-            isIdleResourceWaiting(mDownloadingIdleResource, isWaiting);
-        });
     }
 
     private void listenToToolbarTitleChanges() {
@@ -68,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements OnRecipeClickList
 
     private void placeNewFragment(Fragment newFragment, boolean toSecondPanel) {
         FragmentManager fragmentManager = getSupportFragmentManager();
-        if (fragmentManager.getBackStackEntryCount() > 1) {
+        if (fragmentManager.getBackStackEntryCount() > 3) {
             return;
         }
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -104,16 +101,5 @@ public class MainActivity extends AppCompatActivity implements OnRecipeClickList
     @VisibleForTesting
     public IdlingResource getDownloadingIdlingResource() {
         return mDownloadingIdleResource;
-    }
-
-    private void isIdleResourceWaiting(CountingIdlingResource idleResource, Boolean isWaiting) {
-        if (idleResource == null) {
-            return;
-        }
-        if (isWaiting) {
-            idleResource.increment();
-        } else {
-            idleResource.decrement();
-        }
     }
 }

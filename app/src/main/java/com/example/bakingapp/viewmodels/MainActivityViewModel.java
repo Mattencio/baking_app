@@ -9,17 +9,23 @@ import com.example.bakingapp.retrofit.RetrofitManager;
 import java.util.List;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.test.espresso.idling.CountingIdlingResource;
 
 public class MainActivityViewModel extends AndroidViewModel {
+
+    //Testing
+    @Nullable
+    private final CountingIdlingResource mDownloadingIdleResource = new CountingIdlingResource("DOWNLOADING_IDLE_RESOURCE");
+    private int mIdleResourceCounter = 0;
 
     private MutableLiveData<List<Recipe>> mRecipesLiveData = new MutableLiveData<>();
     private MutableLiveData<Recipe> mSelectedRecipeLiveData = new MutableLiveData<>();
     private MutableLiveData<Step> mSelectedStepLiveData = new MutableLiveData<>();
     private MutableLiveData<String> mToolbarTitle = new MutableLiveData<>();
-    private MutableLiveData<Boolean> mIdleResource = new MutableLiveData<>();
 
     public MainActivityViewModel(@NonNull Application application) {
         super(application);
@@ -66,11 +72,22 @@ public class MainActivityViewModel extends AndroidViewModel {
         mToolbarTitle.postValue(newTitle);
     }
 
-    public LiveData<Boolean> getIdleResource() {
-        return mIdleResource;
+    @Nullable
+    public CountingIdlingResource getDownloadingIdleResource() {
+        return mDownloadingIdleResource;
     }
 
-    public void setIdleResource(boolean isWaiting) {
-        mIdleResource.postValue(isWaiting);
+    public void incrementIdleResource() {
+        assert mDownloadingIdleResource != null;
+        mIdleResourceCounter++;
+        mDownloadingIdleResource.increment();
+    }
+
+    public void decrementIdleResource() {
+        assert mDownloadingIdleResource != null;
+        if (--mIdleResourceCounter <= 0) {
+            return;
+        }
+        mDownloadingIdleResource.decrement();
     }
 }
